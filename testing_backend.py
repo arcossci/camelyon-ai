@@ -2,20 +2,17 @@ import tensorflow as tf
 tf.enable_eager_execution()
 
 import numpy as np
-# from openslide import open_slide, __library_version__ as openslide_version
-# from skimage.color import rgb2gray
+from openslide import open_slide, __library_version__ as openslide_version
+from skimage.color import rgb2gray
 import cv2
 import os
-# import random
+import random
 import pathlib
 from sklearn.metrics import confusion_matrix,precision_score,recall_score,f1_score
 import pandas as pd
 
 
 from training_backend import load_image, read_slide, find_tissue_pixels, apply_mask, load_and_preprocess_image, preprocess_image
-
-
-
 
 def initialize_directories_test(slide_path):
     BASE_DIR = os.getcwd()
@@ -128,7 +125,6 @@ def tumor_predict_mask(test, all_image_paths, depth, width):
     for i in range(len(all_image_paths)):
         img_num[i] = int(all_image_paths[i].strip('.jpg').split('/')[-1].split('_')[-1])
 
-    pixel_num = 64
     # depth, width = int(np.ceil(slide_image.shape[0] / pixel_num)), int(np.ceil(slide_image.shape[1] / pixel_num))
 
     predictions = np.zeros((depth, width))
@@ -139,7 +135,7 @@ def tumor_predict_mask(test, all_image_paths, depth, width):
         x = int(np.mod(img_num[i], width))
         predictions[y, x] = int(test[i][1] > conf_threshold)
 
-
+    return predictions
 
 def heatmap_evaluation(predictions, mask_image, tissue_regions):
 
@@ -183,7 +179,6 @@ def heatmap_evaluation(predictions, mask_image, tissue_regions):
 
 def testing(num_pixels, num_level):
 
-
     slide_path_test = 'tumor_110.tif'
     tumor_mask_path_test = 'tumor_110_mask.tif'
 
@@ -211,6 +206,7 @@ def testing(num_pixels, num_level):
     mask_image = mask_image[:, :, 0]
 
     ## Determine the portions of the image that are tissue
+    
     tissue_pixels = list(find_tissue_pixels(slide_image))
 
     ## Turn the tissue pixels into a mask
@@ -225,4 +221,4 @@ def testing(num_pixels, num_level):
     ds, steps_per_epoch = create_tf_dataset(all_image_paths)
 
     ## Return testing data
-    return ds, steps_per_epoch, all_image_paths, mask_image, tissue_regions, depth, width
+    return ds, slide_image, steps_per_epoch, all_image_paths, mask_image, tissue_regions, depth, width

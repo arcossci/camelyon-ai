@@ -13,7 +13,6 @@ import pathlib
 
 def load_image(slide_path, tumor_mask_path):
 
-
     if not os.path.exists(slide_path):
         os.system('gsutil cp gs://terry-columbia/deep_learning_final_project/' + slide_path + ' ' + slide_path)
     if not  os.path.exists(tumor_mask_path):
@@ -22,6 +21,16 @@ def load_image(slide_path, tumor_mask_path):
     slide = open_slide(slide_path)
     tumor_mask = open_slide(tumor_mask_path)
 
+    for i in range(len(slide.level_dimensions)):
+    
+        assert tumor_mask.level_dimensions[i][0] == slide.level_dimensions[i][0]
+        assert tumor_mask.level_dimensions[i][1] == slide.level_dimensions[i][1]
+
+    # Verify downsampling works as expected
+    width, height = slide.level_dimensions[7]
+    assert width * slide.level_downsamples[7] == slide.level_dimensions[0][0]
+    assert height * slide.level_downsamples[7] == slide.level_dimensions[0][1]
+    
     return slide, tumor_mask
 
 def read_slide(slide, x, y, level, width, height, as_float=False):
@@ -138,7 +147,7 @@ def gen_image_paths(slide_path):
     data_root_tumor = pathlib.Path('data/' + img_num + '/tumor')
     all_image_paths_tumor = list(data_root_tumor.glob('*'))
     num_tumor_images = len(all_image_paths_tumor)
-
+    
     data_root_notumor = pathlib.Path('data/' + img_num + '/no_tumor')
     all_image_paths_notumor = list(data_root_notumor.glob('*'))
     random.shuffle(all_image_paths_notumor)
@@ -153,7 +162,7 @@ def gen_image_paths(slide_path):
 
     all_image_labels = [label_to_index[pathlib.Path(path).parent.name]
                         for path in all_image_paths]
-
+    
     return all_image_paths, all_image_labels
 
 def preprocess_image(image):
@@ -231,5 +240,5 @@ def training(num_pixels, num_level):
     ds, steps_per_epoch = create_tf_dataset(all_image_paths, all_image_labels)
 
     ## Return training data
-    return ds, steps_per_epoch
+    return ds, slide_image, steps_per_epoch
 
