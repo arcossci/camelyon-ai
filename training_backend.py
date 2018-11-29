@@ -204,34 +204,34 @@ def training(num_pixels, num_level):
     tumor_mask_path = 'tumor_091_mask.tif'
 
     slide, tumor_mask  = load_image(slide_path, tumor_mask_path)
-
-    ## Read training image at slide level 3
-    slide_image = read_slide(slide,
+    width, height = slide.level_dimensions[num_level][0], slide.level_dimensions[num_level][1]
+        
+    slide = read_slide(slide,
                              x=0,
                              y=0,
                              level=num_level,
-                             width=slide.level_dimensions[num_level][0],
-                             height=slide.level_dimensions[num_level][1])
+                             width=width,
+                             height=height)
 
 
-    mask_image = read_slide(tumor_mask,
+    tumor_mask = read_slide(tumor_mask,
                             x=0,
                             y=0,
                             level=num_level,
-                            width=slide.level_dimensions[num_level][0],
-                            height=slide.level_dimensions[num_level][1])
+                            width=width,
+                            height=height)
 
     ## Convert the mask from RGB to a black/white binary
-    mask_image = mask_image[:,:,0]
+    tumor_mask = tumor_mask[:,:,0]
 
     ## Determine the portions of the image that are tissue
-    tissue_pixels = list(find_tissue_pixels(slide_image))
+    tissue_pixels = list(find_tissue_pixels(slide))
 
     ## Turn the tissue pixels into a mask
-    tissue_regions = apply_mask(slide_image, tissue_pixels)
+    tissue_regions = apply_mask(slide, tissue_pixels)
 
     ## Call the split function on the training data
-    split_image_and_mask(slide_image, mask_image, tissue_regions, num_pixels, num_level, slide_path)
+    split_image_and_mask(slide, tumor_mask, tissue_regions, num_pixels, num_level, slide_path)
 
     ## Generate image paths and labels
     all_image_paths, all_image_labels = gen_image_paths(slide_path)
@@ -239,6 +239,8 @@ def training(num_pixels, num_level):
     ## Create tf.Dataset for training
     ds, steps_per_epoch = create_tf_dataset(all_image_paths, all_image_labels)
 
+    ## Posibly downscale slide
+    
     ## Return training data
-    return ds, slide_image, steps_per_epoch
+    return ds, slide, steps_per_epoch
 

@@ -121,6 +121,7 @@ def create_tf_dataset(all_image_paths):
 
 def tumor_predict_mask(test, all_image_paths, depth, width):
 
+    test = test[0:len(all_image_paths), :]
     img_num = np.zeros(len(all_image_paths))
     for i in range(len(all_image_paths)):
         img_num[i] = int(all_image_paths[i].strip('.jpg').split('/')[-1].split('_')[-1])
@@ -182,43 +183,46 @@ def testing(num_pixels, num_level):
     slide_path_test = 'tumor_110.tif'
     tumor_mask_path_test = 'tumor_110_mask.tif'
 
+    ## Retrieve slide parameters before overwriting
     slide, tumor_mask = load_image(slide_path_test, tumor_mask_path_test)
-
+    width, height = slide.level_dimensions[num_level][0], slide.level_dimensions[num_level][1]
+    
+    
     ## Read training image at slide level 3
-    slide_image = read_slide(slide,
+    slide = read_slide(slide,
                              x=0,
                              y=0,
                              level=num_level,
-                             width=slide.level_dimensions[num_level][0],
-                             height=slide.level_dimensions[num_level][1])
+                             width=width,
+                             height=height)
 
-    mask_image = read_slide(tumor_mask,
+    tumor_mask = read_slide(tumor_mask,
                             x=0,
                             y=0,
                             level=num_level,
-                            width=slide.level_dimensions[num_level][0],
-                            height=slide.level_dimensions[num_level][1])
+                            width=width,
+                            height=height)
 
-    ## Declare dimensions of slide image for use elsewhere
-    depth, width = int(np.ceil(slide_image.shape[0] / num_pixels)), int(np.ceil(slide_image.shape[1] / num_pixels))
-
+    ## Retrieve new array dimensions
+    image_depth, image_width = int(np.ceil(slide.shape[0] / num_pixels)), int(np.ceil(slide.shape[1] / num_pixels))
+    
     ## Convert the mask from RGB to a black/white binary
-    mask_image = mask_image[:, :, 0]
+    tumor_mask = tumor_mask[:, :, 0]
 
     ## Determine the portions of the image that are tissue
     
-    tissue_pixels = list(find_tissue_pixels(slide_image))
+    tissue_pixels = list(find_tissue_pixels(slide))
 
     ## Turn the tissue pixels into a mask
-    tissue_regions = apply_mask(slide_image, tissue_pixels)
+    tissue_regions = apply_mask(slide, tissue_pixels)
 
-    split_image_test(slide_image, tissue_regions, num_pixels, num_level, slide_path_test)
+    split_image_test(slide, tissue_regions, num_pixels, num_level, slide_path_test)
 
     ## Generate image paths and labels
     all_image_paths = gen_image_paths(slide_path_test)
 
     ## Create tf.Dataset for testing
     ds, steps_per_epoch = create_tf_dataset(all_image_paths)
-
+    
     ## Return testing data
-    return ds, slide_image, steps_per_epoch, all_image_paths, mask_image, tissue_regions, depth, width
+    return ds, slide, steps_per_epoch, all_image_paths, tumor_mask, tissue_regions, image_depth, image_width
