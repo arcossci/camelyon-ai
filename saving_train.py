@@ -1,11 +1,11 @@
 # saving_train.py
 # In saving_train.py, we will need these functions from training_backend.py:
-# •	load_image
-# •	read_slide
-# •	find_tissue_pixels
-# •	apply_mask
-# •	initialize_directories
-# •	split_image_and_mask
+# •    load_image
+# •    read_slide
+# •    find_tissue_pixels
+# •    apply_mask
+# •    initialize_directories
+# •    split_image_and_mask
 
 # This is basically the first part of the function training in training_backend.py
 
@@ -157,40 +157,41 @@ def split_image_and_mask(im, tumor_mask, tissue_mask,  num_pixels, level, slide_
         print('Error with slicing:', oerr)
 
 def train_part_1(training_image_path_list, num_pixels = 64, num_level = 2):
+    for i in training_image_path_list:
+        slide_path = i
+        tumor_mask_path = i.split('.')[0]+'_mask.tif'
+        
+        print(slide_path,tumor_mask_path)
 
-	for i in training_image_path_list:
-	    slide_path = 'tumor_091.tif'
-	    tumor_mask_path = i.split('.')[0]+'_mask.tif'
-
-	    slide, tumor_mask  = load_image(slide_path, tumor_mask_path)
-	    width, height = slide.level_dimensions[num_level][0], slide.level_dimensions[num_level][1]
-	        
-	    slide = read_slide(slide,
-	                             x=0,
-	                             y=0,
-	                             level=num_level,
-	                             width=width,
-	                             height=height)
+        slide, tumor_mask  = load_image(slide_path, tumor_mask_path)
+        width, height = slide.level_dimensions[num_level][0], slide.level_dimensions[num_level][1]
+            
+        slide = read_slide(slide,
+                                 x=0,
+                                 y=0,
+                                 level=num_level,
+                                 width=width,
+                                 height=height)
 
 
-	    tumor_mask = read_slide(tumor_mask,
-	                            x=0,
-	                            y=0,
-	                            level=num_level,
-	                            width=width,
-	                            height=height)
+        tumor_mask = read_slide(tumor_mask,
+                                x=0,
+                                y=0,
+                                level=num_level,
+                                width=width,
+                                height=height)
 
-	    ## Convert the mask from RGB to a black/white binary
-	    tumor_mask = tumor_mask[:,:,0]
+        ## Convert the mask from RGB to a black/white binary
+        tumor_mask = tumor_mask[:,:,0]
 
-	    ## Determine the portions of the image that are tissue
-	    tissue_pixels = list(find_tissue_pixels(slide))
+        ## Determine the portions of the image that are tissue
+        tissue_pixels = list(find_tissue_pixels(slide))
 
-	    ## Turn the tissue pixels into a mask
-	    tissue_regions = apply_mask(slide, tissue_pixels)
+        ## Turn the tissue pixels into a mask
+        tissue_regions = apply_mask(slide, tissue_pixels)
 
-	    ## Call the split function on the training data
-	    split_image_and_mask(slide, tumor_mask, tissue_regions, num_pixels, num_level, slide_path)
+        ## Call the split function on the training data
+        split_image_and_mask(slide, tumor_mask, tissue_regions, num_pixels, num_level, slide_path)
 
 
 

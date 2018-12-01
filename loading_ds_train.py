@@ -1,9 +1,9 @@
 # loading_ds_train.py
 # In loading_ds_train.py we will need the following functions from training_backend.py
-# •	gen_image_paths
-# •	preprocess_images
-# •	load_and_preprocess_image
-# •	create_tf_dataset
+# •    gen_image_paths
+# •    preprocess_images
+# •    load_and_preprocess_image
+# •    create_tf_dataset
 
 # This is basically the second part of the function training in training_backend.py
 
@@ -23,37 +23,37 @@ import random
 import pathlib
 
 def gen_image_paths(training_image_path_list):
-	all_images_image_paths = []
-	all_images_image_labels = []
+    all_images_image_paths = []
+    all_images_image_labels = []
 
-	for i in training_image_path_list:
+    for i in training_image_path_list:
 
-		slide_path = i
+        slide_path = i
 
-	    img_num = slide_path.split('_')[1].strip(".tif")
+        img_num = slide_path.split('_')[1].strip(".tif")
 
-	    data_root_tumor = pathlib.Path('data/' + img_num + '/tumor')
-	    all_image_paths_tumor = list(data_root_tumor.glob('*'))
-	    num_tumor_images = len(all_image_paths_tumor)
-	    
-	    data_root_notumor = pathlib.Path('data/' + img_num + '/no_tumor')
-	    all_image_paths_notumor = list(data_root_notumor.glob('*'))
-	    random.shuffle(all_image_paths_notumor)
-	    all_image_paths_notumor = all_image_paths_notumor[0:num_tumor_images]
+        data_root_tumor = pathlib.Path('data/' + img_num + '/tumor')
+        all_image_paths_tumor = list(data_root_tumor.glob('*'))
+        num_tumor_images = len(all_image_paths_tumor)
+        
+        data_root_notumor = pathlib.Path('data/' + img_num + '/no_tumor')
+        all_image_paths_notumor = list(data_root_notumor.glob('*'))
+        random.shuffle(all_image_paths_notumor)
+        all_image_paths_notumor = all_image_paths_notumor[0:num_tumor_images]
 
-	    all_image_paths = [str(path) for path in all_image_paths_tumor + all_image_paths_notumor]
-	    random.shuffle(all_image_paths)
+        all_image_paths = [str(path) for path in all_image_paths_tumor + all_image_paths_notumor]
+        random.shuffle(all_image_paths)
 
-	    data_root = pathlib.Path('data/' + img_num)
-	    label_names = sorted(item.name for item in data_root.glob('*') if item.is_dir())
-	    label_to_index = dict((name, index) for index, name in enumerate(label_names))
+        data_root = pathlib.Path('data/' + img_num)
+        label_names = sorted(item.name for item in data_root.glob('*') if item.is_dir())
+        label_to_index = dict((name, index) for index, name in enumerate(label_names))
 
-	    all_image_labels = [label_to_index[pathlib.Path(path).parent.name]
-	                        for path in all_image_paths]
+        all_image_labels = [label_to_index[pathlib.Path(path).parent.name]
+                            for path in all_image_paths]
 
-	    #update all image path lists
-	    all_images_image_paths = all_images_image_paths + all_image_paths
-	    all_images_image_labels = all_images_image_labels + all_image_labels
+        #update all image path lists
+        all_images_image_paths = all_images_image_paths + all_image_paths
+        all_images_image_labels = all_images_image_labels + all_image_labels
     
     return all_image_paths, all_image_labels
 
@@ -91,7 +91,7 @@ def create_tf_dataset(all_image_paths, all_image_labels):
 
 def train_part_2(training_image_path_list):
 
-	# change input here from a specific image to an image path
+    # change input here from a specific image to an image path
     all_image_paths, all_image_labels = gen_image_paths(training_image_path_list)
 
     ## Create tf.Dataset for training
@@ -100,4 +100,4 @@ def train_part_2(training_image_path_list):
     ## Posibly downscale slide
     
     ## Return training data
-    return ds, slide, steps_per_epoch
+    return ds, steps_per_epoch
