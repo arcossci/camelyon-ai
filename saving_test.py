@@ -1,15 +1,15 @@
 # saving_test.py
-# testing_backend.py  1) 	saving_test.py   &	2) loading_ds_test.py 
+# testing_backend.py  1)     saving_test.py   &    2) loading_ds_test.py 
 
 # In saving_tset.py, we will need these functions from training_backend.py:
-# •	load_image
-# •	read_slide
-# •	find_tissue_pixels
-# •	apply_mask
+# •    load_image
+# •    read_slide
+# •    find_tissue_pixels
+# •    apply_mask
 
 # And the following functions from testing_backend.py:
-# •	initialize_directories_test
-# •	split_image_test
+# •    initialize_directories_test
+# •    split_image_test
 
 # This is basically the first part of the function testing in testing_backend.py
 
@@ -32,6 +32,32 @@ import os
 import random
 import pathlib
 
+def initialize_directories_test(slide_path):
+    BASE_DIR = os.getcwd()
+
+    img_num = slide_path.split('_')[1].strip(".tif")
+
+    DATA = 'data/'
+    IMG_NUM_FOLDER = img_num + '/'
+    TISSUE_FOLDER = 'tissue_only/'
+    ALL_FOLDER = 'all/'
+
+    DATA_DIR = os.path.join(BASE_DIR, DATA)
+    IMG_NUM_DIR = os.path.join(BASE_DIR, DATA, IMG_NUM_FOLDER)
+    TISSUE_DIR = os.path.join(BASE_DIR, DATA, IMG_NUM_FOLDER, TISSUE_FOLDER)
+    ALL_DIR = os.path.join(BASE_DIR, DATA, IMG_NUM_FOLDER, ALL_FOLDER)
+
+    if not os.path.exists(DATA_DIR):
+        os.mkdir(DATA_DIR)
+    if not os.path.exists(IMG_NUM_DIR):
+        os.mkdir(IMG_NUM_DIR)
+    if not os.path.exists(TISSUE_DIR):
+        os.mkdir(TISSUE_DIR)
+    if not os.path.exists(ALL_DIR):
+        os.mkdir(ALL_DIR)
+
+    return DATA + IMG_NUM_FOLDER + TISSUE_FOLDER, DATA + IMG_NUM_FOLDER + ALL_FOLDER
+
 def load_image(slide_path, tumor_mask_path):
 
     if not os.path.exists(slide_path):
@@ -43,7 +69,7 @@ def load_image(slide_path, tumor_mask_path):
     tumor_mask = open_slide(tumor_mask_path)
 
     for i in range(len(slide.level_dimensions)):
-    
+        
         assert tumor_mask.level_dimensions[i][0] == slide.level_dimensions[i][0]
         assert tumor_mask.level_dimensions[i][1] == slide.level_dimensions[i][1]
 
@@ -55,6 +81,7 @@ def load_image(slide_path, tumor_mask_path):
     return slide, tumor_mask
 
 def read_slide(slide, x, y, level, width, height, as_float=False):
+    print(x,y)
     im = slide.read_region((x,y), level, (width, height))
     im = im.convert('RGB') # drop the alpha channel
     if as_float:
@@ -129,10 +156,10 @@ def split_image_test(im, tissue_mask, num_pixels, level_num, slide_path):
 def test_part_1(testing_image_path, num_pixels=64, num_level=2):
 
 #def testing(num_pixels, num_level):
-	# for i in testing_image_path_list:
+    # for i in testing_image_path_list:
     #slide_path_test = i
     slide_path_test = testing_image_path
-    tumor_mask_path_test = i.split('.')[0]+'_mask.tif'
+    tumor_mask_path_test = slide_path_test.split('.')[0]+'_mask.tif'
     print(slide_path_test, tumor_mask_path_test)
 
     ## Retrieve slide parameters before overwriting

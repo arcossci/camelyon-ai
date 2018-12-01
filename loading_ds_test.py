@@ -2,14 +2,14 @@
 
 # In loading_ds_test.py we will need the following functions
 # from training_backend.py
-# •	preprocess_images
-# •	load_and_preprocess_image
+# •    preprocess_images
+# •    load_and_preprocess_image
 
 # And the following functions from testing_backend.py
-# •	gen_image_paths
-# •	create_tf_dataset
-# •	tumor_predict_mask
-# •	heatmap_evaluation
+# •    gen_image_paths
+# •    create_tf_dataset
+# •    tumor_predict_mask
+# •    heatmap_evaluation
 
 # This is basically the second part of the function testing
 # in testing_backend.py
@@ -30,6 +30,9 @@ import os
 import random
 import pathlib
 import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score
+import pandas as pd
+
 
 def preprocess_image(image):
     image = tf.image.decode_jpeg(image, channels=3)
@@ -133,7 +136,7 @@ def heatmap_evaluation(predictions, mask_image, tissue_regions):
 
 def test_part_2(training_image_path,model,tissue_regions, slide_image_test, mask_image, depth, width):
     ## Generate image paths and labels
-    all_image_paths = gen_image_paths(slide_path_test)
+    all_image_paths = gen_image_paths(training_image_path)
 
     ## Create tf.Dataset for testing
     ds_test, steps_per_epoch_test = create_tf_dataset(all_image_paths)
@@ -145,18 +148,18 @@ def test_part_2(training_image_path,model,tissue_regions, slide_image_test, mask
     predictions = tumor_predict_mask(test_predicts, all_image_paths, depth, width)
 
     fig1, ax1 = plt.subplots()
-	plt.imshow(slide_image_test)
-	ax1.set_title("Original Image")
+    plt.imshow(slide_image_test)
+    ax1.set_title("Original Image")
 
-	fig2, ax2 = plt.subplots()
-	plt.imshow(predictions)
-	ax2.set_title("Predicted Tumor Mask")
+    fig2, ax2 = plt.subplots()
+    plt.imshow(predictions)
+    ax2.set_title("Predicted Tumor Mask")
 
-	fig3, ax3 = plt.subplots()
-	ax3.set_title("Actual Tumor Mask")
-	plt.imshow(mask_image)
+    fig3, ax3 = plt.subplots()
+    ax3.set_title("Actual Tumor Mask")
+    plt.imshow(mask_image)
 
-	heatmap_evaluation(predictions, mask_image, tissue_regions)
+    heatmap_evaluation(predictions, mask_image, tissue_regions)
 
 
 
