@@ -36,7 +36,7 @@ def load_image(slide_path, tumor_mask_path):
     slide = open_slide(slide_path)
     tumor_mask = open_slide(tumor_mask_path)
 
-    for i in range(len(slide.level_dimensions)):
+    for i in range(len(slide.level_dimensions)-1):
     
         assert tumor_mask.level_dimensions[i][0] == slide.level_dimensions[i][0]
         assert tumor_mask.level_dimensions[i][1] == slide.level_dimensions[i][1]
