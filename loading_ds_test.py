@@ -1,24 +1,3 @@
-# loading_ds_test.py
-
-# In loading_ds_test.py we will need the following functions
-# from training_backend.py
-# •    preprocess_images
-# •    load_and_preprocess_image
-
-# And the following functions from testing_backend.py
-# •    gen_image_paths
-# •    create_tf_dataset
-# •    tumor_predict_mask
-# •    heatmap_evaluation
-
-# This is basically the second part of the function testing
-# in testing_backend.py
-
-# This function will take in a single string [e.g. ‘img_003.tif’]
-# and will output a single datastream for the test 
-# image we want to use. It should also output the steps_per_epoch. 
-
-
 import tensorflow as tf
 tf.enable_eager_execution()
 
@@ -45,11 +24,12 @@ def load_and_preprocess_image(path):
     image = tf.read_file(path)
     return preprocess_image(image)
 
-def gen_image_paths(slide_path):
+def gen_image_paths(slide_path, level_num):
     img_num = slide_path.split('_')[1].strip(".tif")
     img_test_folder = 'tissue_only'
 
-    data_root = pathlib.Path('data/' + img_num + '/' + img_test_folder)
+    data_root = pathlib.Path('data/' + img_num + '/level_' + str(level_num) +'/' + img_test_folder)
+
     all_image_paths = list(data_root.glob('*'))
     all_image_paths = [str(path) for path in all_image_paths]
 
@@ -134,9 +114,9 @@ def heatmap_evaluation(predictions, mask_image, tissue_regions):
     print(df_cm_percent)
 
 
-def test_part_2(training_image_path,model,tissue_regions, slide_image_test, mask_image, depth, width):
+def test_part_2(training_image_path, model, tissue_regions, slide_image_test, mask_image, depth, width, num_level):
     ## Generate image paths and labels
-    all_image_paths = gen_image_paths(training_image_path)
+    all_image_paths = gen_image_paths(training_image_path, num_level)
 
     ## Create tf.Dataset for testing
     ds_test, steps_per_epoch_test = create_tf_dataset(all_image_paths)

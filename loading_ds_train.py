@@ -22,7 +22,7 @@ import os
 import random
 import pathlib
 
-def gen_image_paths(training_image_path_list):
+def gen_image_paths(training_image_path_list, num_level):
     all_images_image_paths = []
     all_images_image_labels = []
 
@@ -32,11 +32,11 @@ def gen_image_paths(training_image_path_list):
 
         img_num = slide_path.split('_')[1].strip(".tif")
 
-        data_root_tumor = pathlib.Path('data/' + img_num + '/tumor')
+        data_root_tumor = pathlib.Path('data/' + img_num + '/level_' + str(num_level) + '/tumor')
         all_image_paths_tumor = list(data_root_tumor.glob('*'))
         num_tumor_images = len(all_image_paths_tumor)
         
-        data_root_notumor = pathlib.Path('data/' + img_num + '/no_tumor')
+        data_root_notumor = pathlib.Path('data/' + img_num + '/level_' + str(num_level) + '/no_tumor')
         all_image_paths_notumor = list(data_root_notumor.glob('*'))
         random.shuffle(all_image_paths_notumor)
         all_image_paths_notumor = all_image_paths_notumor[0:num_tumor_images]
@@ -44,7 +44,7 @@ def gen_image_paths(training_image_path_list):
         all_image_paths = [str(path) for path in all_image_paths_tumor + all_image_paths_notumor]
         random.shuffle(all_image_paths)
 
-        data_root = pathlib.Path('data/' + img_num)
+        data_root = pathlib.Path('data/' + img_num + '/level_' + str(num_level))
         label_names = sorted(item.name for item in data_root.glob('*') if item.is_dir())
         label_to_index = dict((name, index) for index, name in enumerate(label_names))
 
@@ -89,10 +89,10 @@ def create_tf_dataset(all_image_paths, all_image_labels):
     return ds, steps_per_epoch
 
 
-def train_part_2(training_image_path_list):
+def train_part_2(training_image_path_list, num_level):
 
     # change input here from a specific image to an image path
-    all_image_paths, all_image_labels = gen_image_paths(training_image_path_list)
+    all_image_paths, all_image_labels = gen_image_paths(training_image_path_list, num_level)
 
     ## Create tf.Dataset for training
     ds, steps_per_epoch = create_tf_dataset(all_image_paths, all_image_labels)
