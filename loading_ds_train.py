@@ -21,6 +21,13 @@ import cv2
 import os
 import random
 import pathlib
+import numpy as np
+from openslide import open_slide, __library_version__ as openslide_version
+from skimage.color import rgb2gray
+import cv2
+import os
+import random
+import pathlib
 
 def gen_image_paths(training_image_path_list, num_level):
     all_images_image_paths = []
@@ -68,15 +75,21 @@ def load_and_preprocess_image(path):
     image = tf.read_file(path)
     return preprocess_image(image)
 
-def create_tf_dataset(all_image_paths, all_image_labels):
-    path_ds = tf.data.Dataset.from_tensor_slices(all_image_paths)
-    image_ds = path_ds.map(load_and_preprocess_image, num_parallel_calls=8)
+def create_tf_dataset(all_image_paths_1, all_image_paths_2, all_image_labels):
+    
+    path_ds_1 = tf.data.Dataset.from_tensor_slices(all_image_paths_1)
+    image_ds_1 = path_ds_1.map(load_and_preprocess_image, num_parallel_calls=8)
+    
+    path_ds_2 = tf.data.Dataset.from_tensor_slices(all_image_paths_2)
+    image_ds_2 = path_ds_2.map(load_and_preprocess_image, num_parallel_calls=8)
+    
     label_ds = tf.data.Dataset.from_tensor_slices(tf.cast(all_image_labels, tf.int64))
-    image_label_ds = tf.data.Dataset.zip((image_ds, label_ds))
+    
+    image_label_ds = tf.data.Dataset.zip(((image_ds_1,image_ds_2), label_ds))
 
-    BATCH_SIZE = 32
+    BATCH_SIZE = 4
 
-    steps_per_epoch = int(np.ceil(len(all_image_paths)/BATCH_SIZE))
+    steps_per_epoch = int(np.ceil(len(all_image_paths_1)/BATCH_SIZE))
 
     # Setting a shuffle buffer size larger than the dataset ensures that the data is completely shuffled.
     ds = image_label_ds.repeat()
@@ -89,13 +102,28 @@ def create_tf_dataset(all_image_paths, all_image_labels):
     return ds, steps_per_epoch
 
 
-def train_part_2(training_image_path_list, num_level):
+def train_part_2(training_image_path_list, num_level_1, num_level_2):
 
     # change input here from a specific image to an image path
-    all_image_paths, all_image_labels = gen_image_paths(training_image_path_list, num_level)
+    all_image_paths_1, all_image_labels_1 = gen_image_paths(training_image_path_list, num_level_1)
+    
+    # create the second file path to mimic the 1st
+    all_image_paths_2 = []
+    for i in all_image_paths_1:
+        split_str = i.split('/')
+        split_str[2] = 'level_'+str(num_level_2)
+        path_2_string = ''
+        for j in split_str:
+            if j == split_str[-1]:
+                path_2_string = path_2_string + j
+            else:
+                path_2_string = path_2_string + j + '/'
+        all_image_paths_2.append(path_2_string)
 
+   
+    
     ## Create tf.Dataset for training
-    ds, steps_per_epoch = create_tf_dataset(all_image_paths, all_image_labels)
+    ds, steps_per_epoch = create_tf_dataset(all_image_paths_1, all_image_paths_2, all_image_labels_1)
 
     ## Posibly downscale slide
     
