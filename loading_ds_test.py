@@ -36,15 +36,19 @@ def gen_image_paths(slide_path, level_num):
     return  all_image_paths
 
 
-def create_tf_dataset(all_image_paths):
-    path_ds = tf.data.Dataset.from_tensor_slices(all_image_paths)
-    image_ds = path_ds.map(load_and_preprocess_image, num_parallel_calls=8)
-    image_test_ds = tf.data.Dataset.zip((image_ds,))
+def create_tf_dataset(all_image_paths_1, all_image_paths_2):
+    path_ds_1 = tf.data.Dataset.from_tensor_slices(all_image_paths_1)
+    image_ds_1 = path_ds_1.map(load_and_preprocess_image, num_parallel_calls=8)
+    
+    path_ds_2 = tf.data.Dataset.from_tensor_slices(all_image_paths_2)
+    image_ds_2 = path_ds_2.map(load_and_preprocess_image, num_parallel_calls=8)
+    
+    image_test_ds = tf.data.Dataset.zip(((image_ds_1,image_ds_2),))
 
     ## Dataset parameters
-    BATCH_SIZE = 32
+    BATCH_SIZE = 4
 
-    steps_per_epoch = int(np.ceil(len(all_image_paths) / BATCH_SIZE))
+    steps_per_epoch = int(np.ceil(len(all_image_paths_1) / BATCH_SIZE))
     # Setting a shuffle buffer size larger than the dataset ensures that the data is completely shuffled.
     ds = image_test_ds.repeat()
     ds = ds.batch(BATCH_SIZE)
@@ -114,18 +118,33 @@ def heatmap_evaluation(predictions, mask_image, tissue_regions):
     print(df_cm_percent)
 
 
-def test_part_2(training_image_path, model, tissue_regions, slide_image_test, mask_image, depth, width, num_level):
-    ## Generate image paths and labels
-    all_image_paths = gen_image_paths(training_image_path, num_level)
-
+def test_part_2(training_image_path, model, tissue_regions, slide_image_test,
+                mask_image, depth, width, num_level_1, num_level_2):
+    
+    ## Generate image paths and labels    
+    all_image_paths_1 = gen_image_paths(training_image_path, num_level_1)
+    
+    # create the second file path to mimic the 1st
+    all_image_paths_2 = []
+    for i in all_image_paths_1:
+        split_str = i.split('/')
+        split_str[2] = 'level_'+str(num_level_2)
+        path_2_string = ''
+        for j in split_str:
+            if j == split_str[-1]:
+                path_2_string = path_2_string + j
+            else:
+                path_2_string = path_2_string + j + '/'
+        all_image_paths_2.append(path_2_string)    
+    
     ## Create tf.Dataset for testing
-    ds_test, steps_per_epoch_test = create_tf_dataset(all_image_paths)
+    ds_test, steps_per_epoch_test = create_tf_dataset(all_image_paths_1, all_image_paths_2)
 
     ## Predict on test data
     test_predicts = model.predict(ds_test, steps = steps_per_epoch_test)
 
     ## Create mask containing test predictions
-    predictions = tumor_predict_mask(test_predicts, all_image_paths, depth, width)
+    predictions = tumor_predict_mask(test_predicts, all_image_paths_1, depth, width)
 
     fig1, ax1 = plt.subplots()
     plt.imshow(slide_image_test)
