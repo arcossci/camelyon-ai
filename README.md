@@ -28,7 +28,7 @@ Due to the amount of training data and the parallel network architecture of the 
 ## Model Architecture
 Our model implements a parallel network architecture. Image context is important for tumor classification, and by training on inputs at multiple zoom levels, our model accounts for both local iamge characteristics and relevant surrounding features. 
 
-![model_architecture](imgs/model_architecture.png)
+![model_architecture](imgs/model_architecture_2.png)
 
 ## Model Specifics
 Our model achieves optimal performance with a VGG16 convolutional base, input images at zoom levels 3 and ###, and a T% confidence threshold for tumor prediction. For these specification, model validation results in a mean F1 score of 0.%%%. 
