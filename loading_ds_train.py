@@ -62,7 +62,7 @@ def gen_image_paths(training_image_path_list, num_level):
         all_images_image_paths = all_images_image_paths + all_image_paths
         all_images_image_labels = all_images_image_labels + all_image_labels
     
-    return all_image_paths, all_image_labels
+    return all_images_image_paths, all_images_image_labels
 
 def preprocess_image(image):
     image = tf.image.decode_jpeg(image, channels=3)
