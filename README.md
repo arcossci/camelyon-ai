@@ -1,5 +1,5 @@
 # camelyon-ai
-Implementation of a CNN for tumor classification in the [Camelyon17 Grand Challenge](https://camelyon17.grand-challenge.org/)
+Implementation of a CNN for tumor classification in the [Camelyon16 Grand Challenge](https://camelyon17.grand-challenge.org/)
 
 # Code Structure
 At the moment, there are two ways of running the camelyon-ai code bank to detect breast cancer metastases. The first, through `train_and_test_split.ipynb`, is the recommended method, as it conserves memory and allows for easy manipulation of the CNN topology to test the performance of different networks.
@@ -25,9 +25,13 @@ OpenSlide 3.4.1  is required, as early versions of the package do not support Ph
 # Implementation
 Due to the amount of training data and the parallel network architecture of the camelyon-ai CNN, training requires the significant computational resources. For our purposes, we set up a virtual machine in Google Cloud Console with 8vCPUs (52 GB RAM), 2 NVIDIA Tesla K80s (24 GB RAM) and 125 GB of disk space. The CUDA and cuDNN libraries were required to utilize the GPUs. 
 
-## Network Architecture
+## Model Architecture
 Our model implements a parallel network architecture. Image context is important for tumor classification, and by training on inputs at multiple zoom levels, our model accounts for both local iamge characteristics and relevant surrounding features. 
-!(imgs/.png)
+
+![model_architecture](imgs/model_architecture.png)
+
+## Model Specifics
+Our model achieves optimal performance with a VGG16 convolutional base, input images at zoom levels 3 and ###, and a T% confidence threshold for tumor prediction. For these specification, model validation results in a mean F1 score of 0.%%%. 
 
 # Example Prediction
 ![Single prediction using camelyon-ai](imgs/single_predict.png)
