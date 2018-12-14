@@ -1,20 +1,3 @@
-# saving_train.py
-# In saving_train.py, we will need these functions from training_backend.py:
-# •    load_image
-# •    read_slide
-# •    find_tissue_pixels
-# •    apply_mask
-# •    initialize_directories
-# •    split_image_and_mask
-
-# This is basically the first part of the function training in training_backend.py
-
-# This function will take in a list of strings [‘img_001.tif, img_002.tif, etc.], 
-# will download the corresponding images and masks, 
-# and will do all the processing necessary to save the images and masks as jpgs. 
-# We can probably keep the structure of the saved files the same for now
-# (e.g. /data/img_001/tumor and  /data/img_001/no_tumor)
-
 import tensorflow as tf
 tf.enable_eager_execution()
 

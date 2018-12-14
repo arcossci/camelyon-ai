@@ -68,7 +68,7 @@ def tumor_predict_mask(test, all_image_paths, depth, width):
     # depth, width = int(np.ceil(slide_image.shape[0] / pixel_num)), int(np.ceil(slide_image.shape[1] / pixel_num))
 
     predictions = np.zeros((depth, width))
-    conf_threshold = 0.7
+    conf_threshold = 0.85
 
     for i in range(len(test)):
         y = int(img_num[i] // width)
@@ -147,17 +147,17 @@ def test_part_2(training_image_path, model, tissue_regions, slide_image_test,
     predictions = tumor_predict_mask(test_predicts, all_image_paths_1, depth, width)
 
     fig1, ax1 = plt.subplots()
+    plt.axis('off')
     plt.imshow(slide_image_test)
-    ax1.set_title("Original Image")
-
+   
     fig2, ax2 = plt.subplots()
+    plt.axis('off')
     plt.imshow(predictions)
-    ax2.set_title("Predicted Tumor Mask")
-
+     
     fig3, ax3 = plt.subplots()
-    ax3.set_title("Actual Tumor Mask")
+    plt.axis('off')
     plt.imshow(mask_image)
-
+    
     heatmap_evaluation(predictions, mask_image, tissue_regions)
 
 
