@@ -2,11 +2,10 @@
 Implementation of a CNN for tumor classification in the [Camelyon16 Grand Challenge](https://camelyon17.grand-challenge.org/)
 
 # Code Structure
-At the moment, there are two ways of running the camelyon-ai code bank to detect breast cancer metastases. The first, through `train_and_test_split.ipynb`, is the recommended method, as it conserves memory and allows for easy manipulation of the CNN topology to test the performance of different networks.
+There are two ways of running the camelyon-ai code to detect breast cancer metastases. The first, and highly recomended method is to use `train_and_test.ipynb`. This enables training on more images with the dual model architure. It does require the setup of the a virtual machine (instructions are discussed below).
 
-`train_and_test_split.ipynb` utilizes 4 helper functions. `saving_train.py` and `loading_ds_train.py` save the training data into slices and load these sliced .jpgs into a tf.data stream, respectively. `saving_test.py` and `loading_ds_test.py` do the same for the validation and testing data.
+The second method of running the cameylon-ai detection network uses `camelyon_single_script.ipynb`. This script runs in Google Colab. Due to memory restrictions in Colab it only trains on a fraction of the data, and doesn't use the dual model architecture. 
 
-The second method of running the cameylon-ai detection network uses `camelyon_single_script.ipynb` and can be helpful when debugging.  
 
 # Requirements
 1. [OpenSlide](https://openslide.org/download/) 3.4.1 (C library). If installing through [GitHub](https://github.com/openslide/openslide), additional packages are required, all of which can be found in the Readme.   
