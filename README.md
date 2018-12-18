@@ -30,7 +30,7 @@ Our model implements a parallel network architecture. Image context is important
 ![model_architecture](imgs/model_architecture_2.png)
 
 ## Model Specifics
-Our model achieves optimal performance with a VGG16 convolutional base, input images at zoom levels 3 and ###, and a T% confidence threshold for tumor prediction. For these specification, model validation results in a mean F1 score of 0.%%%. 
+Our model achieves optimal performance with a VGG16 convolutional base, input images at zoom levels 3 and 4, and a 85% confidence threshold for tumor prediction. For these specification, model validation results in a mean F1 score of 0.65. 
 
 # Example Prediction
 ![Single prediction using camelyon-ai](imgs/single_predict.png)
