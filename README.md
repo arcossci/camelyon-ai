@@ -1,6 +1,9 @@
 # camelyon-ai
 Implementation of a CNN for tumor classification in the [Camelyon16 Grand Challenge](https://camelyon17.grand-challenge.org/)
 
+A video demo can be found [here](https://www.youtube.com/watch?v=BlzUmccOT9U)
+
+
 # Code Structure
 There are two ways of running the camelyon-ai code to detect breast cancer metastases. The first, and highly recomended method is to use `train_and_test.ipynb`. This enables training on more images with the dual model architure. It does require the setup of the a virtual machine (instructions are discussed below).
 
